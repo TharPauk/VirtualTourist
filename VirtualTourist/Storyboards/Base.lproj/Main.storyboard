@@ -33,7 +33,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="ogc-PG-RSc">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" zoomEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ogc-PG-RSc">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                             </mapView>
                         </subviews>
@@ -48,24 +48,25 @@
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tour" largeTitleDisplayMode="always" id="1Ua-TS-CwA"/>
                     <connections>
-                        <segue destination="1F6-zK-D4T" kind="showDetail" id="65T-eP-wNJ"/>
+                        <outlet property="mapView" destination="ogc-PG-RSc" id="xIa-dX-4Yu"/>
+                        <segue destination="1F6-zK-D4T" kind="show" identifier="goToPhotoAlbum" id="65T-eP-wNJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="34.782608695652179" y="93.75"/>
         </scene>
-        <!--View Controller-->
+        <!--Photo Album-->
         <scene sceneID="UDz-PL-2JS">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="USe-y3-ff0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <viewController modalPresentationStyle="fullScreen" id="1F6-zK-D4T" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="1F6-zK-D4T" customClass="PhotoAlbumViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ijj-yd-O86">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Z5o-dn-KN4">
-                                <rect key="frame" x="0.0" y="200" width="414" height="696"/>
+                                <rect key="frame" x="0.0" y="288" width="414" height="608"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Aqg-Mr-pGm">
                                     <size key="itemSize" width="128" height="128"/>
@@ -119,8 +120,8 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-Nb-NAh">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="200"/>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-Nb-NAh">
+                                <rect key="frame" x="0.0" y="88" width="414" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="200" id="rpv-9K-yGi"/>
                                 </constraints>
@@ -131,13 +132,18 @@
                         <constraints>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="5Xn-dK-uTB"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="Jkv-pw-d9h"/>
-                            <constraint firstItem="Ku4-Nb-NAh" firstAttribute="top" secondItem="Ijj-yd-O86" secondAttribute="top" id="JsP-2M-h0b"/>
                             <constraint firstAttribute="bottom" secondItem="Z5o-dn-KN4" secondAttribute="bottom" id="Oat-kc-7HG"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="UfM-0A-da3"/>
+                            <constraint firstItem="Ku4-Nb-NAh" firstAttribute="top" secondItem="TeD-Y5-Mou" secondAttribute="top" id="f04-y5-OPL"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="lRP-M0-IaC"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="wnw-tT-oXk"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Photo Album" id="aMf-pw-lYy"/>
+                    <connections>
+                        <outlet property="collectionView" destination="Z5o-dn-KN4" id="xxJ-nv-Arw"/>
+                        <outlet property="mapView" destination="Ku4-Nb-NAh" id="QfW-tL-tPR"/>
+                    </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="915.94202898550736" y="93.75"/>
