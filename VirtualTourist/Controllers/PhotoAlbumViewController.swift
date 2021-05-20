@@ -10,9 +10,15 @@ import MapKit
 
 class PhotoAlbumViewController: UIViewController {
 
+    
+    // MARK: - Properties
+    
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
+    
+    
+    // MARK: - LifeCycle Functions
     override func viewDidLoad() {
         super.viewDidLoad()
       
