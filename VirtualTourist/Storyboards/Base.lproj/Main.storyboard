@@ -65,7 +65,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Z5o-dn-KN4">
-                                <rect key="frame" x="0.0" y="288" width="414" height="608"/>
+                                <rect key="frame" x="0.0" y="288" width="414" height="521"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Aqg-Mr-pGm">
                                     <size key="itemSize" width="120" height="120"/>
@@ -103,29 +103,35 @@
                                     <constraint firstAttribute="height" constant="200" id="rpv-9K-yGi"/>
                                 </constraints>
                             </mapView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b30-k7-lnF">
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b30-k7-lnF" customClass="RoundedButton" customModule="VirtualTourist" customModuleProvider="target">
                                 <rect key="frame" x="16" y="817" width="382" height="45"/>
-                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" systemColor="systemGreenColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="Sz2-5Z-Xmg"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                 <state key="normal" title="New Collection">
-                                    <color key="titleShadowColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleShadowColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="TeD-Y5-Mou"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="5Xn-dK-uTB"/>
-                            <constraint firstItem="b30-k7-lnF" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" constant="16" id="G0j-Wz-cBo"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="G0j-Wz-cBo"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="Jkv-pw-d9h"/>
-                            <constraint firstAttribute="bottom" secondItem="Z5o-dn-KN4" secondAttribute="bottom" id="Oat-kc-7HG"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="UfM-0A-da3"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="centerX" secondItem="Ijj-yd-O86" secondAttribute="centerX" id="c6j-aN-Zlh"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="top" secondItem="TeD-Y5-Mou" secondAttribute="top" id="f04-y5-OPL"/>
                             <constraint firstItem="TeD-Y5-Mou" firstAttribute="trailing" secondItem="b30-k7-lnF" secondAttribute="trailing" constant="16" id="kew-e3-Y1V"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="lRP-M0-IaC"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="top" secondItem="Z5o-dn-KN4" secondAttribute="bottom" constant="8" id="vjL-1N-pXU"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="bottom" secondItem="TeD-Y5-Mou" secondAttribute="bottom" id="wAk-4w-NB3"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="wnw-tT-oXk"/>
                         </constraints>
@@ -142,9 +148,17 @@
             <point key="canvasLocation" x="915.94202898550736" y="93.75"/>
         </scene>
     </scenes>
+    <designables>
+        <designable name="b30-k7-lnF">
+            <size key="intrinsicContentSize" width="108" height="30"/>
+        </designable>
+    </designables>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
