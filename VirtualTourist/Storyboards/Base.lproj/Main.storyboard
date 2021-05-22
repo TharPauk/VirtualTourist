@@ -64,60 +64,38 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Z5o-dn-KN4">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Z5o-dn-KN4">
                                 <rect key="frame" x="0.0" y="288" width="414" height="608"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Aqg-Mr-pGm">
-                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="itemSize" width="120" height="120"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="7DQ-K5-8SC">
-                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="mgr-m5-pND">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="PhotoCell" id="BbM-eO-Kkq" customClass="PhotoCell" customModule="VirtualTourist" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" insetsLayoutMarginsFromSafeArea="NO" id="7lX-Bd-MEf">
+                                            <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="77v-33-DO0">
-                                                    <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vch-87-269">
+                                                    <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="77v-33-DO0" secondAttribute="trailing" id="Ciw-3c-QDa"/>
-                                                <constraint firstAttribute="bottom" secondItem="77v-33-DO0" secondAttribute="bottom" id="NgY-np-cVw"/>
-                                                <constraint firstItem="77v-33-DO0" firstAttribute="top" secondItem="mgr-m5-pND" secondAttribute="top" id="VmR-eN-ErL"/>
-                                                <constraint firstItem="77v-33-DO0" firstAttribute="leading" secondItem="mgr-m5-pND" secondAttribute="leading" id="eGH-GY-803"/>
-                                            </constraints>
                                         </collectionViewCellContentView>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Rqa-KQ-q7q">
-                                        <rect key="frame" x="143" y="0.0" width="128" height="128"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="cOg-OR-xIc">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </collectionViewCellContentView>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="09r-dL-MkH">
-                                        <rect key="frame" x="286" y="0.0" width="128" height="128"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Xb7-xx-bGe">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </collectionViewCellContentView>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="hq1-Ef-ZsD">
-                                        <rect key="frame" x="0.0" y="138" width="128" height="128"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="BgH-Ft-YXs">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="imageView" destination="vch-87-269" id="1K5-7Z-6VD"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="1F6-zK-D4T" id="QyF-90-boS"/>
+                                    <outlet property="delegate" destination="1F6-zK-D4T" id="XgY-Zp-cbo"/>
+                                </connections>
                             </collectionView>
                             <mapView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" mapType="standard" zoomEnabled="NO" scrollEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-Nb-NAh">
                                 <rect key="frame" x="0.0" y="88" width="414" height="200"/>
@@ -125,22 +103,37 @@
                                     <constraint firstAttribute="height" constant="200" id="rpv-9K-yGi"/>
                                 </constraints>
                             </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b30-k7-lnF">
+                                <rect key="frame" x="16" y="817" width="382" height="45"/>
+                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="Sz2-5Z-Xmg"/>
+                                </constraints>
+                                <state key="normal" title="New Collection">
+                                    <color key="titleShadowColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="TeD-Y5-Mou"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="5Xn-dK-uTB"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" constant="16" id="G0j-Wz-cBo"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="Jkv-pw-d9h"/>
                             <constraint firstAttribute="bottom" secondItem="Z5o-dn-KN4" secondAttribute="bottom" id="Oat-kc-7HG"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="UfM-0A-da3"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="centerX" secondItem="Ijj-yd-O86" secondAttribute="centerX" id="c6j-aN-Zlh"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="top" secondItem="TeD-Y5-Mou" secondAttribute="top" id="f04-y5-OPL"/>
+                            <constraint firstItem="TeD-Y5-Mou" firstAttribute="trailing" secondItem="b30-k7-lnF" secondAttribute="trailing" constant="16" id="kew-e3-Y1V"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="lRP-M0-IaC"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="bottom" secondItem="TeD-Y5-Mou" secondAttribute="bottom" id="wAk-4w-NB3"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="wnw-tT-oXk"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Photo Album" id="aMf-pw-lYy"/>
                     <connections>
                         <outlet property="collectionView" destination="Z5o-dn-KN4" id="xxJ-nv-Arw"/>
+                        <outlet property="flowLayout" destination="Aqg-Mr-pGm" id="HbC-6c-Ddx"/>
                         <outlet property="mapView" destination="Ku4-Nb-NAh" id="QfW-tL-tPR"/>
                     </connections>
                 </viewController>
