@@ -8,30 +8,113 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController {
+class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
 
     
-    // MARK: - Properties
+    // MARK: - Outlets & Properties
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    @IBOutlet weak var newCollectionButton: RoundedButton!
+    var selectedLocation: CLLocation!
+    private var photosInfo = [PhotoInfo]()
+    
     
     
     // MARK: - LifeCycle Functions
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        mapView.delegate = self
+        setupCollectionView()
+        
+        fetchPhotos(coordinate: selectedLocation.coordinate)
+        setupFlowLayout()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        setCenterRegion(coordinate: selectedLocation.coordinate)
+        addPin(coordinate: selectedLocation.coordinate)
+    }
+    
+    
+    //  MARK: - Initialization Functions
+    
+    private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
-
+    }
+    
+    private func setupFlowLayout() {
         flowLayout.minimumLineSpacing = 1.0
         flowLayout.minimumInteritemSpacing = 1.0
     }
     
+    
+    // MARK: - Button Related Functions
+    
+    @IBAction func newCollectionButtonPressed(_ sender: Any) {
+        self.fetchPhotos(coordinate: selectedLocation.coordinate)
+    }
+    
+    private func setDownloadingState(isDownloading: Bool) {
+        newCollectionButton.isEnabled = !isDownloading
+        if isDownloading {
+            newCollectionButton.setTitle("Downloading", for: .disabled)
+        } else {
+            newCollectionButton.setTitle("New Collection", for: .normal)
+        }
+        
+    }
+    
+    
+    // MARK: - Map Related Functions
+    
+    
+    private func setCenterRegion(coordinate: CLLocationCoordinate2D) {
+        let distance: CLLocationDistance = 100000.0
+        let coordinate2D = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let region = MKCoordinateRegion(center: coordinate2D, latitudinalMeters: distance, longitudinalMeters: distance)
+        mapView.setRegion(region, animated: true)
+    }
+    
+    private func addPin(coordinate: CLLocationCoordinate2D) {
+        let pin = MKPointAnnotation()
+        pin.coordinate = coordinate
+        mapView.addAnnotation(pin)
+    }
+    
+    
+    
+    // MARK: - Networking Related Functions
 
-
+    private func fetchPhotos(coordinate: CLLocationCoordinate2D) {
+        setDownloadingState(isDownloading: true)
+        FlickrClient.getPhotosList(latitude: coordinate.latitude, longitude: coordinate.longitude) { (photosInfo, error) in
+            if let error = error {
+                self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
+            }
+            self.photosInfo = photosInfo
+            self.collectionView.reloadData()
+            self.setDownloadingState(isDownloading: false)
+        }
+    }
+    
+    private func alertError(title: String, message: String) {
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "Ok", style: .default))
+        present(alertVC, animated: true)
+    }
+    
+    
 }
 
+
+
+// MARK: - UICollectionViewDelegateFlowLayout
 
 extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
     
@@ -47,21 +130,23 @@ extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
 }
 
 
+
+// MARK: - UICollectionViewDataSource
+
 extension PhotoAlbumViewController: UICollectionViewDataSource {
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
-        cell.imageView.image = #imageLiteral(resourceName: "leesunbin")
+        cell.imageView.image = #imageLiteral(resourceName: "placeholder_image")
+        cell.setImage(for: photosInfo[indexPath.item])
         return cell
     }
-    
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 28
+        photosInfo.count
     }
 }

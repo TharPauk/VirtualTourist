@@ -12,4 +12,12 @@ class PhotoCell: UICollectionViewCell {
     
     @IBOutlet weak var imageView: UIImageView!
     
+    func setImage(for photoInfo: PhotoInfo) {
+        FlickrClient.downloadPhoto(photoInfo: photoInfo) { (data, error) in
+            guard let data = data else { return }
+            self.imageView.image = UIImage(data: data)
+        }
+    }
+    
+    
 }

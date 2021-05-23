@@ -118,6 +118,9 @@
                                         <real key="value" value="8"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="newCollectionButtonPressed:" destination="1F6-zK-D4T" eventType="touchUpInside" id="syl-5B-mB9"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="TeD-Y5-Mou"/>
@@ -141,6 +144,7 @@
                         <outlet property="collectionView" destination="Z5o-dn-KN4" id="xxJ-nv-Arw"/>
                         <outlet property="flowLayout" destination="Aqg-Mr-pGm" id="HbC-6c-Ddx"/>
                         <outlet property="mapView" destination="Ku4-Nb-NAh" id="QfW-tL-tPR"/>
+                        <outlet property="newCollectionButton" destination="b30-k7-lnF" id="CU2-mr-086"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="USe-y3-ff0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

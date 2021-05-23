@@ -20,7 +20,7 @@ struct PhotoInfo: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id, owner, secret, server, farm, title
-        case isPublic = "ispublic", isFriend = "isfriend", isFamily = "isfamilya"
+        case isPublic = "ispublic", isFriend = "isfriend", isFamily = "isfamily"
     }
 }
 

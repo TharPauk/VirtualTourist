@@ -15,19 +15,8 @@ import UIKit
         }
     }
     
-    fileprivate func setupBlurView() {
-        backgroundColor = .systemBackground
-        let blur = UIBlurEffect(style: .systemThinMaterial)
-        let blurView = UIVisualEffectView(effect: blur)
-
-        blurView.frame = self.bounds
-        insertSubview(blurView, at: 0)
-    }
-    
-    
     override func layoutSubviews() {
         super.layoutSubviews()
-        setupBlurView()
         layer.cornerRadius = cornerRadius
     }
 

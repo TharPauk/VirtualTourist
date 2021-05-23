@@ -14,7 +14,7 @@ class TravelLocationsMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     var longGestureRecognizer: UILongPressGestureRecognizer!
-    
+    private var selectedLocation: CLLocation?
     
     
     // MARK: - LifeCycle Functions
@@ -62,8 +62,15 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         guard let coordinate = view.annotation?.coordinate else { return }
  
-        let geoCoder = CLGeocoder()
-        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        
+        self.selectedLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        self.performSegue(withIdentifier: "goToPhotoAlbum", sender: nil)
+
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToPhotoAlbum",
+           let viewController = segue.destination as? PhotoAlbumViewController {
+            viewController.selectedLocation = self.selectedLocation
+        }
     }
 }
