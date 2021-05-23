@@ -65,14 +65,5 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         let geoCoder = CLGeocoder()
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         
-        geoCoder.reverseGeocodeLocation(location) { (placemarks, error) in
-            guard let placemarks = placemarks else { return }
-            var areasOfInterests = [String]()
-            
-            placemarks.forEach {
-                areasOfInterests.append(contentsOf: $0.areasOfInterest ?? [])
-            }
-            self.performSegue(withIdentifier: "goToPhotoAlbum", sender: nil)
-        }
     }
 }

@@ -36,5 +36,25 @@ class FlickrClient {
         }
     }
     
-    
+    @discardableResult class func getPhotosList(latitude lat: Double, longitude lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) -> URLSessionTask {
+        let task = URLSession.shared.dataTask(with: EndPoints.search(lat, lon).url) { (data, response, error) in
+            guard let data = data else { return }
+            
+            do {
+                let result = try JSONDecoder().decode(PhotosInfoResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(result.photos.photo, nil)
+                }
+            } catch {
+                print("Error in decoding photos list: \(error)")
+                DispatchQueue.main.async {
+                    completion([], error)
+                }
+            }
+        }
+        
+        task.resume()
+        
+        return task
+    }
 }
