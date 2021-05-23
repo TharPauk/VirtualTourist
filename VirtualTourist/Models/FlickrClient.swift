@@ -19,8 +19,8 @@ class FlickrClient {
         static let apiKeyParam = "&api_key=\(FlickrClient.apiKey)"
         static let formatParam = "&per_page=16&format=json&nojsoncallback=1"
         
-        case search(Double, Double)
-        case downloadImage(String, String, String)
+        case search(latitude: Double, longitude: Double)
+        case downloadImage(server: String, id: String, secret: String)
         
         var stringValue: String {
             switch self {
@@ -37,7 +37,7 @@ class FlickrClient {
     }
     
     @discardableResult class func getPhotosList(latitude lat: Double, longitude lon: Double, completion: @escaping ([PhotoInfo], Error?) -> Void) -> URLSessionTask {
-        let task = URLSession.shared.dataTask(with: EndPoints.search(lat, lon).url) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: EndPoints.search(latitude: lat, longitude: lon).url) { (data, response, error) in
             guard let data = data else { return }
             
             do {
@@ -50,6 +50,19 @@ class FlickrClient {
                 DispatchQueue.main.async {
                     completion([], error)
                 }
+            }
+        }
+        
+        task.resume()
+        
+        return task
+    }
+    
+    @discardableResult class func downloadPhoto(photoInfo: PhotoInfo, completion: @escaping (Data?, Error?) -> Void) -> URLSessionTask {
+        let task = URLSession.shared.dataTask(with: EndPoints.downloadImage(server: photoInfo.server, id: photoInfo.id, secret: photoInfo.secret).url) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                completion(data, nil)
             }
         }
         
