@@ -17,6 +17,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var newCollectionButton: RoundedButton!
+    @IBOutlet weak var noPhotosFoundLabel: UILabel!
     var selectedLocation: CLLocation!
     private var photosInfo = [PhotoInfo]()
     
@@ -35,6 +36,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        noPhotosFoundLabel.isHidden = true
         
         setCenterRegion(coordinate: selectedLocation.coordinate)
         addPin(coordinate: selectedLocation.coordinate)
@@ -94,9 +96,13 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     private func fetchPhotos(coordinate: CLLocationCoordinate2D) {
         setDownloadingState(isDownloading: true)
         FlickrClient.getPhotosList(latitude: coordinate.latitude, longitude: coordinate.longitude) { (photosInfo, error) in
+    
+            self.noPhotosFoundLabel.isHidden = photosInfo.count > 0
+            
             if let error = error {
                 self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
             }
+            
             self.photosInfo = photosInfo
             self.collectionView.reloadData()
             self.setDownloadingState(isDownloading: false)
