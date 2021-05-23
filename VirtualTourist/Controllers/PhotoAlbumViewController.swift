@@ -18,7 +18,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var noPhotosFoundLabel: UILabel!
-    var selectedLocation: CLLocation!
+    var selectedLocation: CLLocation! {
+        return CLLocation(latitude: pin.latitude, longitude: pin.longitude)
+    }
+    var pin: Pin!
+    var dataController: DataController!
     private var photosInfo = [PhotoInfo]()
     
     
@@ -143,8 +147,8 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
-        cell.imageView.image = #imageLiteral(resourceName: "placeholder_image")
-        cell.setImage(for: photosInfo[indexPath.item])
+        cell.dataController = self.dataController
+        cell.setData(for: photosInfo[indexPath.item], pin: pin)
         return cell
     }
     

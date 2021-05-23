@@ -13,8 +13,8 @@ class DataController {
     // MARK: - Properties
     
     private let persistentContainer: NSPersistentContainer!
-    private var backgroundContext: NSManagedObjectContext!
-    private var viewContext: NSManagedObjectContext {
+    var backgroundContext: NSManagedObjectContext!
+    var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     

@@ -13,6 +13,7 @@ class TravelLocationsMapViewController: UIViewController {
     // MARK: - Properties
     
     @IBOutlet weak var mapView: MKMapView!
+    var dataController = DataController(modelName: "VirtualTourist")
     var longGestureRecognizer: UILongPressGestureRecognizer!
     private var selectedLocation: CLLocation?
     
@@ -47,6 +48,7 @@ class TravelLocationsMapViewController: UIViewController {
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
         
+        addPin(coordinate: coordinate)
         mapView.addAnnotation(annotation)
     }
     
@@ -69,8 +71,17 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToPhotoAlbum",
-           let viewController = segue.destination as? PhotoAlbumViewController {
-            viewController.selectedLocation = self.selectedLocation
+           let viewController = segue.destination as? PhotoAlbumViewController,
+           let selectedCoordinate = selectedLocation?.coordinate {
+            viewController.dataController = self.dataController
         }
+    }
+    
+    private func addPin(coordinate: CLLocationCoordinate2D) -> Pin {
+        let pin = Pin(context: dataController.viewContext)
+        pin.latitude = coordinate.latitude
+        pin.longitude = coordinate.longitude
+        dataController.saveContext()
+        return pin
     }
 }
