@@ -7,15 +7,18 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class TravelLocationsMapViewController: UIViewController {
 
     // MARK: - Properties
     
     @IBOutlet weak var mapView: MKMapView!
-    var dataController = DataController(modelName: "VirtualTourist")
+//    var dataController = DataController(modelName: "VirtualTourist")
     var longGestureRecognizer: UILongPressGestureRecognizer!
     private var selectedLocation: CLLocation?
+    private var fetchedResultsController: NSFetchedResultsController<Pin>!
+//    private var pins = [Pin]()
     
     
     // MARK: - LifeCycle Functions
@@ -28,6 +31,8 @@ class TravelLocationsMapViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        loadPinsFromStore()
+        setupPinPointsOnMap()
         setupGestureRecognizer()
     }
     
@@ -37,22 +42,68 @@ class TravelLocationsMapViewController: UIViewController {
     
     private func setupGestureRecognizer() {
         longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressed(_:)))
-        longGestureRecognizer.minimumPressDuration = 0.3
+        longGestureRecognizer.minimumPressDuration = 0.5
         
         mapView.addGestureRecognizer(longGestureRecognizer)
     }
     
     @objc private func handleLongPressed(_ gestureRecoginzer: UILongPressGestureRecognizer) {
+        longGestureRecognizer.isEnabled = false
+        
         let location = gestureRecoginzer.location(in: mapView)
         let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
-        
-        addPin(coordinate: coordinate)
+        savePin(coordinate: coordinate)
         mapView.addAnnotation(annotation)
     }
     
-
+    
+    
+    // MARK: - Pin Related Functions
+   
+    private func setupPinPointsOnMap() {
+        var annotations = [MKPointAnnotation]()
+        print("count = \(fetchedResultsController.fetchedObjects?.count)")
+        fetchedResultsController.fetchedObjects?.forEach {
+            let annotation = createAnnotation(pin: $0)
+            annotations.append(annotation)
+        }
+        mapView.addAnnotations(annotations)
+    }
+    
+    private func createCoordinate(latitude: Double, longitude: Double) -> CLLocationCoordinate2D {
+        let lat = CLLocationDegrees(latitude)
+        let lon = CLLocationDegrees(longitude)
+        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        return coordinate
+    }
+    
+    private func createAnnotation(pin: Pin) -> MKPointAnnotation {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = createCoordinate(latitude: pin.latitude, longitude: pin.longitude)
+        return annotation
+    }
+    
+    private func createPinView(annotation: MKAnnotation, reuseIdentifier: String) -> MKPinAnnotationView {
+        let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        pinView.pinTintColor = .systemBlue
+        return pinView
+    }
+    
+    
+    
+    // MARK: - Segue
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToPhotoAlbum",
+           let viewController = segue.destination as? PhotoAlbumViewController,
+           let selectedLocation = self.selectedLocation {
+            viewController.dataController = DataController.shared
+            viewController.selectedLocation = selectedLocation
+        }
+    }
+    
 }
 
 
@@ -63,25 +114,57 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         guard let coordinate = view.annotation?.coordinate else { return }
- 
+
         self.selectedLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         self.performSegue(withIdentifier: "goToPhotoAlbum", sender: nil)
 
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "goToPhotoAlbum",
-           let viewController = segue.destination as? PhotoAlbumViewController,
-           let selectedCoordinate = selectedLocation?.coordinate {
-            viewController.dataController = self.dataController
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let pinId = "pinId"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: pinId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = createPinView(annotation: annotation, reuseIdentifier: pinId)
+            return pinView
         }
+        
+        pinView?.annotation = annotation
+        return pinView
     }
     
-    private func addPin(coordinate: CLLocationCoordinate2D) -> Pin {
-        let pin = Pin(context: dataController.viewContext)
+    
+   
+    
+    
+}
+
+
+
+
+// MARK: - NSFetchedResultsControllerDelegate
+
+extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
+    
+    private func loadPinsFromStore() {
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataController.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("Error in fetching pins: \(error.localizedDescription)")
+        }
+    }
+
+    private func savePin(coordinate: CLLocationCoordinate2D) {
+        let pin = Pin(context: DataController.shared.viewContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
-        dataController.saveContext()
-        return pin
+        DataController.shared.saveContext()
+        longGestureRecognizer.isEnabled = true
     }
 }

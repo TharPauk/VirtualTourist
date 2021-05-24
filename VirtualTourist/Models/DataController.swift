@@ -11,6 +11,7 @@ import CoreData
 class DataController {
     
     // MARK: - Properties
+    static let shared = DataController(modelName: "VirtualTourist")
     
     private let persistentContainer: NSPersistentContainer!
     var backgroundContext: NSManagedObjectContext!

@@ -18,10 +18,8 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var noPhotosFoundLabel: UILabel!
-    var selectedLocation: CLLocation! {
-        return CLLocation(latitude: pin.latitude, longitude: pin.longitude)
-    }
-    var pin: Pin!
+    var selectedLocation: CLLocation!
+//    var pin: Pin!
     var dataController: DataController!
     private var photosInfo = [PhotoInfo]()
     
@@ -148,7 +146,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
-        cell.setData(for: photosInfo[indexPath.item], pin: pin)
+//        cell.setData(for: photosInfo[indexPath.item], pin: pin)
         return cell
     }
     
@@ -158,5 +156,29 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         photosInfo.count
+    }
+    
+    private func createPinView(annotation: MKAnnotation, reuseIdentifier: String) -> MKPinAnnotationView {
+        let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        pinView.pinTintColor = .systemBlue
+        return pinView
+    }
+}
+
+
+
+
+extension PhotoAlbumViewController {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let pinId = "pinId"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: pinId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = createPinView(annotation: annotation, reuseIdentifier: pinId)
+            return pinView
+        }
+        
+        pinView?.annotation = annotation
+        return pinView
     }
 }
