@@ -15,6 +15,7 @@
 		D9BABC16265AAF6300CEBEDA /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BABC15265AAF6300CEBEDA /* DataModel.swift */; };
 		D9C4C36D26557BA300CEA4CE /* TravelLocationsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C4C36C26557BA300CEA4CE /* TravelLocationsMapViewController.swift */; };
 		D9C4C37026557BE200CEA4CE /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C4C36F26557BE200CEA4CE /* PhotoAlbumViewController.swift */; };
+		D9C65CF9265D40A2007D82BD /* MapView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C65CF8265D40A2007D82BD /* MapView+Extensions.swift */; };
 		D9CD597826596A7900D1D9E6 /* RoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CD597726596A7900D1D9E6 /* RoundedButton.swift */; };
 		D9F0CF11265BF41C008DF9C4 /* Pin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F0CF10265BF41C008DF9C4 /* Pin+Extensions.swift */; };
 		D9F0CF14265BF483008DF9C4 /* Photo+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F0CF13265BF483008DF9C4 /* Photo+Extensions.swift */; };
@@ -34,6 +35,7 @@
 		D9BABC15265AAF6300CEBEDA /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		D9C4C36C26557BA300CEA4CE /* TravelLocationsMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelLocationsMapViewController.swift; sourceTree = "<group>"; };
 		D9C4C36F26557BE200CEA4CE /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
+		D9C65CF8265D40A2007D82BD /* MapView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MapView+Extensions.swift"; sourceTree = "<group>"; };
 		D9CD597726596A7900D1D9E6 /* RoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedButton.swift; sourceTree = "<group>"; };
 		D9F0CF10265BF41C008DF9C4 /* Pin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+Extensions.swift"; sourceTree = "<group>"; };
 		D9F0CF13265BF483008DF9C4 /* Photo+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photo+Extensions.swift"; sourceTree = "<group>"; };
@@ -88,6 +90,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		D9C65CF7265D408A007D82BD /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				D9C65CF8265D40A2007D82BD /* MapView+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		D9F0CF16265BF4B5008DF9C4 /* Managed Objects Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +126,7 @@
 		D9F698FD265422B6007A0437 /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
+				D9C65CF7265D408A007D82BD /* Extensions */,
 				D9C4C3692655773100CEA4CE /* Views */,
 				D9C4C3682655772500CEA4CE /* Models */,
 				D9C4C3672655771D00CEA4CE /* Controllers */,
@@ -220,6 +231,7 @@
 				D9C4C36D26557BA300CEA4CE /* TravelLocationsMapViewController.swift in Sources */,
 				D9F0CF14265BF483008DF9C4 /* Photo+Extensions.swift in Sources */,
 				D9C4C37026557BE200CEA4CE /* PhotoAlbumViewController.swift in Sources */,
+				D9C65CF9265D40A2007D82BD /* MapView+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,7 +8,7 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
+class PhotoAlbumViewController: UIViewController {
 
     
     // MARK: - Outlets & Properties
@@ -19,10 +19,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var noPhotosFoundLabel: UILabel!
     var selectedLocation: CLLocation!
-//    var pin: Pin!
+    var pin: Pin!
     var dataController: DataController!
-    private var photosInfo = [PhotoInfo]()
     
+    private var photos = [Photo]()
+    private var photosInfo = [PhotoInfo]()
     
     
     // MARK: - LifeCycle Functions
@@ -30,6 +31,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
+        
         setupCollectionView()
         
         fetchPhotos(coordinate: selectedLocation.coordinate)
@@ -38,8 +40,9 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        noPhotosFoundLabel.isHidden = true
+        photos.append(contentsOf: pin.photos?.allObjects as? Array ?? [])
         
+        noPhotosFoundLabel.isHidden = true
         setCenterRegion(coordinate: selectedLocation.coordinate)
         addPin(coordinate: selectedLocation.coordinate)
     }
@@ -61,7 +64,9 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
     // MARK: - Button Related Functions
     
     @IBAction func newCollectionButtonPressed(_ sender: Any) {
-        self.fetchPhotos(coordinate: selectedLocation.coordinate)
+        if photos.count ?? 0 <= 0 {
+            self.fetchPhotos(coordinate: selectedLocation.coordinate)
+        }
     }
     
     private func setDownloadingState(isDownloading: Bool) {
@@ -97,18 +102,19 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate {
 
     private func fetchPhotos(coordinate: CLLocationCoordinate2D) {
         setDownloadingState(isDownloading: true)
-        FlickrClient.getPhotosList(latitude: coordinate.latitude, longitude: coordinate.longitude) { (photosInfo, error) in
+        FlickrClient.getPhotosList(latitude: coordinate.latitude, longitude: coordinate.longitude, completion: handleGetPhotosList(photosInfo:error:))
+    }
     
-            self.noPhotosFoundLabel.isHidden = photosInfo.count > 0
-            
-            if let error = error {
-                self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
-            }
-            
-            self.photosInfo = photosInfo
-            self.collectionView.reloadData()
-            self.setDownloadingState(isDownloading: false)
+    private func handleGetPhotosList(photosInfo: [PhotoInfo], error: Error?) {
+        self.noPhotosFoundLabel.isHidden = photosInfo.count > 0
+        
+        if let error = error {
+            self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
         }
+        
+        self.photosInfo = photosInfo
+        self.collectionView.reloadData()
+        self.setDownloadingState(isDownloading: false)
     }
     
     private func alertError(title: String, message: String) {
@@ -146,39 +152,34 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
-//        cell.setData(for: photosInfo[indexPath.item], pin: pin)
+        
+        if photos.count <= 0 {
+            print("------not downloaded-------")
+            cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
+        } else {
+            print("------downloaded-------")
+            cell.imageView.image = UIImage(data: photos[indexPath.row].data!)
+        }
+        
         return cell
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         photosInfo.count
     }
     
-    private func createPinView(annotation: MKAnnotation, reuseIdentifier: String) -> MKPinAnnotationView {
-        let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        pinView.pinTintColor = .systemBlue
-        return pinView
-    }
+    
 }
 
 
 
 
-extension PhotoAlbumViewController {
+// MARK: - MKMapViewDelegate
+
+extension PhotoAlbumViewController: MKMapViewDelegate {
+    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let pinId = "pinId"
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: pinId) as? MKPinAnnotationView
-        
-        if pinView == nil {
-            pinView = createPinView(annotation: annotation, reuseIdentifier: pinId)
-            return pinView
-        }
-        
-        pinView?.annotation = annotation
-        return pinView
+        return setupAnnotationView(mapView, pinId: pinId, annotation: annotation)
     }
 }

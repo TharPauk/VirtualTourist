@@ -41,7 +41,6 @@ class FlickrClient {
         let task = URLSession.shared.dataTask(with: EndPoints.search(latitude: lat, longitude: lon, page: page).url) { (data, response, error) in
             guard let data = data else { return }
             
-            print("random = \(page)")
             do {
                 let result = try JSONDecoder().decode(PhotosInfoResponse.self, from: data)
                 DispatchQueue.main.async {

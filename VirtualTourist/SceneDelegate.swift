@@ -13,8 +13,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        
         let dataController = DataController(modelName: "VirtualTourist")
+        
         dataController.load {
+            
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let rootVC = storyboard.instantiateViewController(identifier: "TravelLocationsMapView") as! TravelLocationsMapViewController
             rootVC.dataController = dataController
@@ -25,6 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             guard let windowScene = (scene as? UIWindowScene) else { return }
             self.window?.windowScene = windowScene
+            
         }
        
     }

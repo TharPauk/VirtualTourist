@@ -17,9 +17,9 @@ class TravelLocationsMapViewController: UIViewController {
     var dataController: DataController!
     var longGestureRecognizer: UILongPressGestureRecognizer!
     private var selectedLocation: CLLocation?
+    private var selectedPin: Pin!
     private var fetchedResultsController: NSFetchedResultsController<Pin>!
-//    private var pins = [Pin]()
-    
+
     
     // MARK: - LifeCycle Functions
     
@@ -84,12 +84,6 @@ class TravelLocationsMapViewController: UIViewController {
         return annotation
     }
     
-    private func createPinView(annotation: MKAnnotation, reuseIdentifier: String) -> MKPinAnnotationView {
-        let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        pinView.pinTintColor = .systemBlue
-        return pinView
-    }
-    
     
     
     // MARK: - Segue
@@ -100,6 +94,7 @@ class TravelLocationsMapViewController: UIViewController {
            let selectedLocation = self.selectedLocation {
             viewController.dataController = dataController
             viewController.selectedLocation = selectedLocation
+            viewController.pin = selectedPin
         }
     }
     
@@ -113,27 +108,23 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         guard let coordinate = view.annotation?.coordinate else { return }
-
+        let latitude = coordinate.latitude
+        let longitude = coordinate.longitude
+        selectedPin = fetchedResultsController.fetchedObjects?.filter {
+            $0.latitude == latitude && $0.longitude == longitude
+        }.first
+        
+        print("selectedPin = \(selectedPin.latitude)")
+        
         self.selectedLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         self.performSegue(withIdentifier: "goToPhotoAlbum", sender: nil)
-
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let pinId = "pinId"
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: pinId) as? MKPinAnnotationView
-        
-        if pinView == nil {
-            pinView = createPinView(annotation: annotation, reuseIdentifier: pinId)
-            return pinView
-        }
-        
-        pinView?.annotation = annotation
-        return pinView
+        return setupAnnotationView(mapView, pinId: pinId, annotation: annotation)
     }
     
-    
-   
     
     
 }
@@ -164,6 +155,5 @@ extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
         try? dataController.viewContext.save()
-//        longGestureRecognizer.isEnabled = true
     }
 }
