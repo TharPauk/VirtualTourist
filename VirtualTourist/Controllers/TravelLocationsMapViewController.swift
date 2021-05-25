@@ -14,7 +14,7 @@ class TravelLocationsMapViewController: UIViewController {
     // MARK: - Properties
     
     @IBOutlet weak var mapView: MKMapView!
-//    var dataController = DataController(modelName: "VirtualTourist")
+    var dataController: DataController!
     var longGestureRecognizer: UILongPressGestureRecognizer!
     private var selectedLocation: CLLocation?
     private var fetchedResultsController: NSFetchedResultsController<Pin>!
@@ -42,20 +42,20 @@ class TravelLocationsMapViewController: UIViewController {
     
     private func setupGestureRecognizer() {
         longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressed(_:)))
-        longGestureRecognizer.minimumPressDuration = 0.5
+        longGestureRecognizer.minimumPressDuration = 0.3
         
         mapView.addGestureRecognizer(longGestureRecognizer)
     }
     
     @objc private func handleLongPressed(_ gestureRecoginzer: UILongPressGestureRecognizer) {
-        longGestureRecognizer.isEnabled = false
-        
-        let location = gestureRecoginzer.location(in: mapView)
-        let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = coordinate
-        savePin(coordinate: coordinate)
-        mapView.addAnnotation(annotation)
+        if gestureRecoginzer.state == .recognized {
+            let location = gestureRecoginzer.location(in: mapView)
+            let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            savePin(coordinate: coordinate)
+            mapView.addAnnotation(annotation)
+        }
     }
     
     
@@ -64,7 +64,6 @@ class TravelLocationsMapViewController: UIViewController {
    
     private func setupPinPointsOnMap() {
         var annotations = [MKPointAnnotation]()
-        print("count = \(fetchedResultsController.fetchedObjects?.count)")
         fetchedResultsController.fetchedObjects?.forEach {
             let annotation = createAnnotation(pin: $0)
             annotations.append(annotation)
@@ -99,7 +98,7 @@ class TravelLocationsMapViewController: UIViewController {
         if segue.identifier == "goToPhotoAlbum",
            let viewController = segue.destination as? PhotoAlbumViewController,
            let selectedLocation = self.selectedLocation {
-            viewController.dataController = DataController.shared
+            viewController.dataController = dataController
             viewController.selectedLocation = selectedLocation
         }
     }
@@ -150,7 +149,7 @@ extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataController.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         
         do {
@@ -161,10 +160,10 @@ extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
     }
 
     private func savePin(coordinate: CLLocationCoordinate2D) {
-        let pin = Pin(context: DataController.shared.viewContext)
+        let pin = Pin(context: dataController.viewContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
-        DataController.shared.saveContext()
-        longGestureRecognizer.isEnabled = true
+        try? dataController.viewContext.save()
+//        longGestureRecognizer.isEnabled = true
     }
 }
