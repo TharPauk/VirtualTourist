@@ -51,13 +51,9 @@ class TravelLocationsMapViewController: UIViewController {
         if gestureRecoginzer.state == .recognized {
             let location = gestureRecoginzer.location(in: mapView)
             let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = coordinate
             savePin(coordinate: coordinate)
-            mapView.addAnnotation(annotation)
         }
     }
-    
     
     
     // MARK: - Pin Related Functions
@@ -95,6 +91,8 @@ class TravelLocationsMapViewController: UIViewController {
             viewController.dataController = dataController
             viewController.selectedLocation = selectedLocation
             viewController.pin = selectedPin
+            
+            
         }
     }
     
@@ -114,9 +112,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             $0.latitude == latitude && $0.longitude == longitude
         }.first
         
-        print("selectedPin = \(selectedPin.latitude)")
-        
         self.selectedLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        
         self.performSegue(withIdentifier: "goToPhotoAlbum", sender: nil)
     }
     
@@ -156,4 +153,23 @@ extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
         pin.longitude = coordinate.longitude
         try? dataController.viewContext.save()
     }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .insert:
+            let pin = fetchedResultsController.object(at: newIndexPath!)
+            addPinToMap(coordinate: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
+        default: break
+            
+        }
+    }
+    
+    
+    private func addPinToMap(coordinate: CLLocationCoordinate2D) {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        mapView.addAnnotation(annotation)
+    }
+    
+    
 }

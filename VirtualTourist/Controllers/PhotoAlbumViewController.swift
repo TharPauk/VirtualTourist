@@ -154,10 +154,8 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         cell.dataController = self.dataController
         
         if photos.count <= 0 {
-            print("------not downloaded-------")
             cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
         } else {
-            print("------downloaded-------")
             cell.imageView.image = UIImage(data: photos[indexPath.row].data!)
         }
         

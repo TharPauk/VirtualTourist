@@ -17,21 +17,26 @@ class PhotoCell: UICollectionViewCell {
     func downloadPhoto(for photoInfo: PhotoInfo, pin: Pin) {
         FlickrClient.downloadPhoto(photoInfo: photoInfo) { (data, error) in
             guard let data = data else { return }
+            
             self.savePhoto(pin: pin, photoData: data)
+            
         }
     }
     
     
     private func savePhoto(pin: Pin, photoData: Data) {
         guard let backgroundContext = dataController.backgroundContext else { return }
-//        let viewContext = dataController.viewContext
+        let pinFromBackgroundContext = backgroundContext.object(with: pin.objectID) as! Pin
         
-        backgroundContext.perform {
+        dataController.backgroundContext.perform {
             let photo = Photo(context: backgroundContext)
-            photo.pin = pin
+            photo.pin = pinFromBackgroundContext
             photo.data = photoData
             try? backgroundContext.save()
-            self.imageView.image = UIImage(data: photoData)
+            
+            DispatchQueue.main.async {
+                self.imageView.image = UIImage(data: photoData)
+            }
         }
     }
 
