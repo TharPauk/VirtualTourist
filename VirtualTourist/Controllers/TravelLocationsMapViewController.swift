@@ -31,7 +31,7 @@ class TravelLocationsMapViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadPinsFromStore()
+        setupFetchedResultsController()
         setupPinPointsOnMap()
         setupGestureRecognizer()
     }
@@ -133,7 +133,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
 
 extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
     
-    private func loadPinsFromStore() {
+    private func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         

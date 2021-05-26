@@ -7,6 +7,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class PhotoAlbumViewController: UIViewController {
 
@@ -18,9 +19,12 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var noPhotosFoundLabel: UILabel!
+    
+    var blockOperations: [BlockOperation] = []
     var selectedLocation: CLLocation!
     var pin: Pin!
     var dataController: DataController!
+    private var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     private var photos = [Photo]()
     private var photosInfo = [PhotoInfo]()
@@ -42,9 +46,32 @@ class PhotoAlbumViewController: UIViewController {
         super.viewWillAppear(animated)
         photos.append(contentsOf: pin.photos?.allObjects as? Array ?? [])
         
+        setupFetchedResultsController()
         noPhotosFoundLabel.isHidden = true
+        
         setCenterRegion(coordinate: selectedLocation.coordinate)
         addPin(coordinate: selectedLocation.coordinate)
+    }
+    
+    private func setupFetchedResultsController() {
+        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+        
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "\(pin)-photos")
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("error in fetching photos: \(error.localizedDescription)")
+        }
+    }
+    
+    private func deletePhoto(indexPath: IndexPath) {
+        let photoToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(photoToDelete)
+        try? dataController.viewContext.save()
     }
     
     
@@ -123,7 +150,10 @@ class PhotoAlbumViewController: UIViewController {
         present(alertVC, animated: true)
     }
     
-    
+    deinit {
+        blockOperations.forEach{ $0.cancel() }
+        blockOperations.removeAll(keepingCapacity: false)
+    }
 }
 
 
@@ -149,13 +179,19 @@ extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        deletePhoto(indexPath: indexPath)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
         
         if photos.count <= 0 {
+            print("Downloading")
             cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
         } else {
+            print("Downloaded")
             cell.imageView.image = UIImage(data: photos[indexPath.row].data!)
         }
         
@@ -179,5 +215,39 @@ extension PhotoAlbumViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let pinId = "pinId"
         return setupAnnotationView(mapView, pinId: pinId, annotation: annotation)
+    }
+}
+
+
+
+// MARK: - NSFetchedResultsControllerDelegate
+
+extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        blockOperations.removeAll(keepingCapacity: false)
+    }
+
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .delete:
+            blockOperations.append(
+            BlockOperation(block: { [weak self] in
+                if let this = self {
+                    this.collectionView!.deleteItems(at: [indexPath!])
+                    this.photos.remove(at: indexPath!.item)
+                }
+            })
+            
+        )
+        default: break
+        }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        collectionView!.performBatchUpdates({ () -> Void in
+            blockOperations.forEach { $0.start() }
+        }, completion: { (finished) -> Void in
+            self.blockOperations.removeAll(keepingCapacity: false)
+        })
     }
 }

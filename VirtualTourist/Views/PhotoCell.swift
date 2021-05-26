@@ -19,7 +19,6 @@ class PhotoCell: UICollectionViewCell {
             guard let data = data else { return }
             
             self.savePhoto(pin: pin, photoData: data)
-            
         }
     }
     
