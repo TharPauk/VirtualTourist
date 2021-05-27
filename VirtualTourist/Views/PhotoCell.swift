@@ -24,7 +24,7 @@ class PhotoCell: UICollectionViewCell {
     
     
     private func savePhoto(pin: Pin, photoData: Data) {
-        guard let backgroundContext = dataController.backgroundContext else { return }
+         let backgroundContext = dataController.viewContext // else { return }
         let pinFromBackgroundContext = backgroundContext.object(with: pin.objectID) as! Pin
         
         dataController.backgroundContext.perform {

@@ -26,6 +26,7 @@ class PhotoAlbumViewController: UIViewController {
     var dataController: DataController!
     private var fetchedResultsController: NSFetchedResultsController<Photo>!
     
+    private var shouldDownload = true
     private var photos = [Photo]()
     private var photosInfo = [PhotoInfo]()
     
@@ -38,19 +39,28 @@ class PhotoAlbumViewController: UIViewController {
         
         setupCollectionView()
         
-        fetchPhotos(coordinate: selectedLocation.coordinate)
         setupFlowLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        photos.append(contentsOf: pin.photos?.allObjects as? Array ?? [])
         
-        setupFetchedResultsController()
+        shouldDownload = pin.photos?.count ?? 0 <= 0
+        
+        setupData()
         noPhotosFoundLabel.isHidden = true
         
         setCenterRegion(coordinate: selectedLocation.coordinate)
         addPin(coordinate: selectedLocation.coordinate)
+    }
+    
+    private func setupData() {
+        if shouldDownload {
+            fetchPhotos(coordinate: selectedLocation.coordinate)
+        }
+        setupFetchedResultsController()
+        photos = fetchedResultsController.fetchedObjects ?? []
+        
     }
     
     private func setupFetchedResultsController() {
@@ -63,6 +73,7 @@ class PhotoAlbumViewController: UIViewController {
         
         do {
             try fetchedResultsController.performFetch()
+            
         } catch {
             fatalError("error in fetching photos: \(error.localizedDescription)")
         }
@@ -73,6 +84,7 @@ class PhotoAlbumViewController: UIViewController {
         dataController.viewContext.delete(photoToDelete)
         try? dataController.viewContext.save()
     }
+    
     
     
     //  MARK: - Initialization Functions
@@ -91,9 +103,7 @@ class PhotoAlbumViewController: UIViewController {
     // MARK: - Button Related Functions
     
     @IBAction func newCollectionButtonPressed(_ sender: Any) {
-        if photos.count ?? 0 <= 0 {
-            self.fetchPhotos(coordinate: selectedLocation.coordinate)
-        }
+        self.fetchPhotos(coordinate: selectedLocation.coordinate)
     }
     
     private func setDownloadingState(isDownloading: Bool) {
@@ -134,6 +144,9 @@ class PhotoAlbumViewController: UIViewController {
     
     private func handleGetPhotosList(photosInfo: [PhotoInfo], error: Error?) {
         self.noPhotosFoundLabel.isHidden = photosInfo.count > 0
+        let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
+        pinToDeletePhotos.photos = nil
+        try? dataController.viewContext.save()
         
         if let error = error {
             self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
@@ -187,19 +200,18 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
         
-        if photos.count <= 0 {
-            print("Downloading")
+        if shouldDownload {
             cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
         } else {
-            print("Downloaded")
-            cell.imageView.image = UIImage(data: photos[indexPath.row].data!)
+            let imageData = (fetchedResultsController.fetchedObjects?[indexPath.item])?.data
+            cell.imageView.image = UIImage(data: imageData!)
         }
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        photosInfo.count
+        shouldDownload ? photosInfo.count : photos.count
     }
     
     
@@ -234,15 +246,19 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             BlockOperation(block: { [weak self] in
                 if let this = self {
                     this.collectionView!.deleteItems(at: [indexPath!])
-                    this.photos.remove(at: indexPath!.item)
+                    if this.shouldDownload {
+                        this.photosInfo.remove(at: indexPath!.item)
+                    } else {
+                        this.photos.remove(at: indexPath!.item)
+                    }
                 }
             })
-            
+
         )
         default: break
         }
     }
-    
+
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         collectionView!.performBatchUpdates({ () -> Void in
             blockOperations.forEach { $0.start() }
@@ -251,3 +267,6 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         })
     }
 }
+
+
+

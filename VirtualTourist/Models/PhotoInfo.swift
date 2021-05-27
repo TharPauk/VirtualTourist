@@ -5,7 +5,7 @@
 //  Created by Min Thet Maung on 22/05/2021.
 //
 
-import Foundation
+import UIKit
 
 struct PhotoInfo: Codable {
     let id: String
@@ -35,4 +35,9 @@ struct PageMetadata: Codable {
 struct PhotosInfoResponse: Codable {
     let photos: PageMetadata
     let stat: String
+}
+
+struct PhotoData: Codable {
+    let info: PhotoInfo
+    var imageData: Data
 }
