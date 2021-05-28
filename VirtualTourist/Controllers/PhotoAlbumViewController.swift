@@ -27,7 +27,7 @@ class PhotoAlbumViewController: UIViewController {
     private var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     private var shouldDownload = true
-    private var photos = [Photo]()
+//    private var photos = [Photo]()
     private var photosInfo = [PhotoInfo]()
     
     
@@ -60,7 +60,7 @@ class PhotoAlbumViewController: UIViewController {
             fetchPhotos(coordinate: selectedLocation.coordinate)
         } else {
             setupFetchedResultsController()
-            photos = fetchedResultsController.fetchedObjects ?? []
+            let photos = fetchedResultsController.fetchedObjects ?? []
             DataModel.photosData = photos.map { $0.data! }
         }
         
@@ -68,7 +68,7 @@ class PhotoAlbumViewController: UIViewController {
     
     private func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "\(pin)-photos")
@@ -106,6 +106,14 @@ class PhotoAlbumViewController: UIViewController {
     // MARK: - Button Related Functions
     
     @IBAction func newCollectionButtonPressed(_ sender: Any) {
+        self.collectionView.reloadData()
+        DataModel.photosData = []
+        photosInfo = []
+        
+        let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
+        pinToDeletePhotos.photos = nil
+        try? dataController.viewContext.save()
+        
         self.fetchPhotos(coordinate: selectedLocation.coordinate)
     }
     
@@ -147,9 +155,6 @@ class PhotoAlbumViewController: UIViewController {
     
     private func handleGetPhotosList(photosInfo: [PhotoInfo], error: Error?) {
         self.noPhotosFoundLabel.isHidden = photosInfo.count > 0
-        let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
-        pinToDeletePhotos.photos = nil
-        try? dataController.viewContext.save()
         
         if let error = error {
             self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
@@ -214,7 +219,10 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        shouldDownload ? photosInfo.count : photos.count
+        if shouldDownload {
+            return photosInfo.count
+        }
+        return DataModel.photosData.count
     }
     
     
@@ -239,7 +247,7 @@ extension PhotoAlbumViewController: MKMapViewDelegate {
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        blockOperations.removeAll(keepingCapacity: false)
+//        blockOperations.removeAll(keepingCapacity: false)
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -249,10 +257,9 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             BlockOperation(block: { [weak self] in
                 if let this = self {
                     this.collectionView!.deleteItems(at: [indexPath!])
+                    DataModel.photosData.remove(at: indexPath!.item)
                     if this.shouldDownload {
                         this.photosInfo.remove(at: indexPath!.item)
-                    } else {
-                        this.photos.remove(at: indexPath!.item)
                     }
                 }
             })

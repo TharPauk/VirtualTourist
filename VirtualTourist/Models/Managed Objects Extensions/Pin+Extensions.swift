@@ -11,6 +11,6 @@ import CoreData
 extension Pin {
     public override func awakeFromInsert() {
         super.awakeFromInsert()
-        self.creationDate = Date()
+//        self.creationDate = Date()
     }
 }

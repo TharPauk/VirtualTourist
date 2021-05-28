@@ -33,6 +33,7 @@ class PhotoCell: UICollectionViewCell {
             let photo = Photo(context: backgroundContext)
             photo.pin = pinFromBackgroundContext
             photo.data = photoData
+            photo.creationDate = Date()
             try? backgroundContext.save()
         }
     }
