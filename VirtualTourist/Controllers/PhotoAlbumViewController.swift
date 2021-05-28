@@ -206,6 +206,8 @@ class PhotoAlbumViewController: UIViewController {
     
     
     private func deletePhoto(indexPath: IndexPath) {
+        setupFetchedResultsController()
+        
         let photoToDelete = fetchedResultsController.object(at: indexPath)
         dataController.viewContext.delete(photoToDelete)
         try? dataController.viewContext.save()
