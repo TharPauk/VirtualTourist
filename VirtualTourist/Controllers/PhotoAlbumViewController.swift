@@ -95,12 +95,40 @@ class PhotoAlbumViewController: UIViewController {
     private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
+        setupGestureRecognizer()
     }
     
     private func setupFlowLayout() {
         flowLayout.minimumLineSpacing = 1.0
         flowLayout.minimumInteritemSpacing = 1.0
     }
+    
+    private func setupGestureRecognizer() {
+        let longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressed(_:)))
+        longGestureRecognizer.minimumPressDuration = 0.3
+        
+        collectionView?.addGestureRecognizer(longGestureRecognizer)
+    }
+    
+    @objc private func handleLongPressed(_ gestureRecoginzer: UILongPressGestureRecognizer) {
+        if gestureRecoginzer.state == .ended {
+            let point = gestureRecoginzer.location(in: collectionView)
+            if let indexPath = collectionView.indexPathForItem(at: point) {
+                confirmDelete(itemAt: indexPath)
+            }
+        }
+    }
+    
+    private func confirmDelete(itemAt indexPath: IndexPath) {
+        let alertVC = UIAlertController(title: "Are you sure?", message: "Do you really want to delete this photo?", preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
+            self.deletePhoto(indexPath: indexPath)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        [deleteAction, cancelAction].forEach { alertVC.addAction($0) }
+        present(alertVC, animated: true)
+    }
+    
     
     
     // MARK: - Button Related Functions
@@ -128,8 +156,8 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     
-    // MARK: - Map Related Functions
     
+    // MARK: - Map Related Functions
     
     private func setCenterRegion(coordinate: CLLocationCoordinate2D) {
         let distance: CLLocationDistance = 100000.0
@@ -199,10 +227,6 @@ extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - UICollectionViewDataSource
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        deletePhoto(indexPath: indexPath)
-    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
