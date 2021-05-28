@@ -12,23 +12,26 @@ import CoreData
 class PhotoAlbumViewController: UIViewController {
 
     
-    // MARK: - Outlets & Properties
+    // MARK: - Outlets
     
     @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var noPhotosFoundLabel: UILabel!
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var newCollectionButton: RoundedButton!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
-    var blockOperations: [BlockOperation] = []
-    var selectedLocation: CLLocation!
+    
+    
+    // MARK: - Properties
+    
     var pin: Pin!
+    var selectedLocation: CLLocation!
     var dataController: DataController!
-    private var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     private var shouldDownload = true
-//    private var photos = [Photo]()
     private var photosInfo = [PhotoInfo]()
+    private var blockOperations = [BlockOperation]()
+    private var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     
     // MARK: - LifeCycle Functions
@@ -38,14 +41,11 @@ class PhotoAlbumViewController: UIViewController {
         mapView.delegate = self
         
         setupCollectionView()
-        
         setupFlowLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        shouldDownload = pin.photos?.count ?? 0 <= 0
         
         setupData()
         noPhotosFoundLabel.isHidden = true
@@ -54,47 +54,12 @@ class PhotoAlbumViewController: UIViewController {
         addPin(coordinate: selectedLocation.coordinate)
     }
     
-    private func setupData() {
-        DataModel.photosData = []
-        if shouldDownload {
-            fetchPhotos(coordinate: selectedLocation.coordinate)
-        } else {
-            setupFetchedResultsController()
-            let photos = fetchedResultsController.fetchedObjects ?? []
-            DataModel.photosData = photos.map { $0.data! }
-        }
-        
-    }
-    
-    private func setupFetchedResultsController() {
-        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
-        
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "\(pin)-photos")
-        fetchedResultsController.delegate = self
-        
-        do {
-            try fetchedResultsController.performFetch()
-            
-        } catch {
-            fatalError("error in fetching photos: \(error.localizedDescription)")
-        }
-    }
-    
-    private func deletePhoto(indexPath: IndexPath) {
-        let photoToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(photoToDelete)
-        try? dataController.viewContext.save()
-    }
-    
-    
     
     //  MARK: - Initialization Functions
     
     private func setupCollectionView() {
-        collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.dataSource = self
         setupGestureRecognizer()
     }
     
@@ -102,6 +67,23 @@ class PhotoAlbumViewController: UIViewController {
         flowLayout.minimumLineSpacing = 1.0
         flowLayout.minimumInteritemSpacing = 1.0
     }
+    
+    private func setupData() {
+        shouldDownload = pin.photos?.count ?? 0 <= 0
+        DataModel.photosData = []
+        
+        if shouldDownload {
+            fetchPhotos(coordinate: selectedLocation.coordinate)
+        } else {
+            setupFetchedResultsController()
+            let photos = fetchedResultsController.fetchedObjects ?? []
+            DataModel.photosData = photos.map { $0.data! }
+        }
+    }
+    
+    
+    
+    // MARK: - Gesture Related Functions
     
     private func setupGestureRecognizer() {
         let longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressed(_:)))
@@ -117,16 +99,6 @@ class PhotoAlbumViewController: UIViewController {
                 confirmDelete(itemAt: indexPath)
             }
         }
-    }
-    
-    private func confirmDelete(itemAt indexPath: IndexPath) {
-        let alertVC = UIAlertController(title: "Are you sure?", message: "Do you really want to delete this photo?", preferredStyle: .alert)
-        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
-            self.deletePhoto(indexPath: indexPath)
-        }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        [deleteAction, cancelAction].forEach { alertVC.addAction($0) }
-        present(alertVC, animated: true)
     }
     
     
@@ -193,10 +165,50 @@ class PhotoAlbumViewController: UIViewController {
         self.setDownloadingState(isDownloading: false)
     }
     
+    
+    // MARK: - Alert Message Functions
+    
+    private func confirmDelete(itemAt indexPath: IndexPath) {
+        let alertVC = UIAlertController(title: "Are you sure?", message: "Do you really want to delete this photo?", preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
+            self.deletePhoto(indexPath: indexPath)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        [deleteAction, cancelAction].forEach { alertVC.addAction($0) }
+        present(alertVC, animated: true)
+    }
+    
     private func alertError(title: String, message: String) {
         let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertVC.addAction(UIAlertAction(title: "Ok", style: .default))
         present(alertVC, animated: true)
+    }
+    
+    
+    
+    // MARK: - CoreData Related Functions
+    
+    private func setupFetchedResultsController() {
+        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+        
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "\(pin)-photos")
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+            
+        } catch {
+            fatalError("error in fetching photos: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    private func deletePhoto(indexPath: IndexPath) {
+        let photoToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(photoToDelete)
+        try? dataController.viewContext.save()
     }
     
     deinit {
@@ -204,6 +216,7 @@ class PhotoAlbumViewController: UIViewController {
         blockOperations.removeAll(keepingCapacity: false)
     }
 }
+
 
 
 
@@ -270,27 +283,29 @@ extension PhotoAlbumViewController: MKMapViewDelegate {
 // MARK: - NSFetchedResultsControllerDelegate
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        blockOperations.removeAll(keepingCapacity: false)
+    
+    private func deleteOperation(_ indexPath: IndexPath?) -> BlockOperation {
+        return BlockOperation(block: { [weak self] in
+            if let this = self {
+                this.collectionView!.deleteItems(at: [indexPath!])
+                DataModel.photosData.remove(at: indexPath!.item)
+                if this.shouldDownload {
+                    this.photosInfo.remove(at: indexPath!.item)
+                }
+            }
+        })
     }
-
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .delete:
-            blockOperations.append(
-            BlockOperation(block: { [weak self] in
-                if let this = self {
-                    this.collectionView!.deleteItems(at: [indexPath!])
-                    DataModel.photosData.remove(at: indexPath!.item)
-                    if this.shouldDownload {
-                        this.photosInfo.remove(at: indexPath!.item)
-                    }
-                }
-            })
-
-        )
+            blockOperations.append(deleteOperation(indexPath))
         default: break
         }
+    }
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        blockOperations.removeAll(keepingCapacity: false)
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
