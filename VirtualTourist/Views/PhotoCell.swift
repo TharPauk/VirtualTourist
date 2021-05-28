@@ -19,6 +19,8 @@ class PhotoCell: UICollectionViewCell {
             guard let data = data else { return }
             
             self.savePhoto(pin: pin, photoData: data)
+            self.imageView.image = UIImage(data: data)
+            DataModel.photosData.append(data)
         }
     }
     
@@ -27,15 +29,11 @@ class PhotoCell: UICollectionViewCell {
          let backgroundContext = dataController.viewContext // else { return }
         let pinFromBackgroundContext = backgroundContext.object(with: pin.objectID) as! Pin
         
-        dataController.backgroundContext.perform {
+        backgroundContext.perform {
             let photo = Photo(context: backgroundContext)
             photo.pin = pinFromBackgroundContext
             photo.data = photoData
             try? backgroundContext.save()
-            
-            DispatchQueue.main.async {
-                self.imageView.image = UIImage(data: photoData)
-            }
         }
     }
 

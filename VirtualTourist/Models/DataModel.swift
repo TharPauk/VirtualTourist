@@ -9,4 +9,5 @@ import Foundation
 
 class DataModel {
     static var currentPhotosInfoResponse: PhotosInfoResponse?
+    static var photosData = [Data]()
 }

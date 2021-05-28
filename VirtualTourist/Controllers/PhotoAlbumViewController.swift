@@ -55,11 +55,14 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     private func setupData() {
+        DataModel.photosData = []
         if shouldDownload {
             fetchPhotos(coordinate: selectedLocation.coordinate)
+        } else {
+            setupFetchedResultsController()
+            photos = fetchedResultsController.fetchedObjects ?? []
+            DataModel.photosData = photos.map { $0.data! }
         }
-        setupFetchedResultsController()
-        photos = fetchedResultsController.fetchedObjects ?? []
         
     }
     
@@ -200,11 +203,11 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
         
-        if shouldDownload {
-            cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
+        if DataModel.photosData.count > indexPath.item {
+            let imageData = DataModel.photosData[indexPath.item]
+            cell.imageView.image = UIImage(data: imageData)
         } else {
-            let imageData = (fetchedResultsController.fetchedObjects?[indexPath.item])?.data
-            cell.imageView.image = UIImage(data: imageData!)
+            cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
         }
         
         return cell
