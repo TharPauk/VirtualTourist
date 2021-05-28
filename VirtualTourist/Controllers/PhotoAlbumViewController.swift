@@ -60,7 +60,6 @@ class PhotoAlbumViewController: UIViewController {
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
-        setupGestureRecognizer()
     }
     
     private func setupFlowLayout() {
@@ -81,25 +80,6 @@ class PhotoAlbumViewController: UIViewController {
         }
     }
     
-    
-    
-    // MARK: - Gesture Related Functions
-    
-    private func setupGestureRecognizer() {
-        let longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressed(_:)))
-        longGestureRecognizer.minimumPressDuration = 0.3
-        
-        collectionView?.addGestureRecognizer(longGestureRecognizer)
-    }
-    
-    @objc private func handleLongPressed(_ gestureRecoginzer: UILongPressGestureRecognizer) {
-        if gestureRecoginzer.state == .ended {
-            let point = gestureRecoginzer.location(in: collectionView)
-            if let indexPath = collectionView.indexPathForItem(at: point) {
-                confirmDelete(itemAt: indexPath)
-            }
-        }
-    }
     
     
     
@@ -242,6 +222,11 @@ extension PhotoAlbumViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - UICollectionViewDataSource
 
 extension PhotoAlbumViewController: UICollectionViewDataSource {
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        confirmDelete(itemAt: indexPath)
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
