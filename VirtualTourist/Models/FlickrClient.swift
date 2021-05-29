@@ -60,7 +60,7 @@ class FlickrClient {
         return task
     }
     
-    @discardableResult class func downloadPhoto(photoInfo: PhotoInfo, completion: @escaping (Data?, Error?) -> Void) -> URLSessionTask {
+    class func downloadPhoto(photoInfo: PhotoInfo, completion: @escaping (Data?, Error?) -> Void) {
         let task = URLSession.shared.dataTask(with: EndPoints.downloadImage(server: photoInfo.server, id: photoInfo.id, secret: photoInfo.secret).url) { (data, response, error) in
             
             DispatchQueue.main.async {
@@ -69,8 +69,6 @@ class FlickrClient {
         }
         
         task.resume()
-        
-        return task
     }
     
     class func getRandomPageNumber() -> Int {

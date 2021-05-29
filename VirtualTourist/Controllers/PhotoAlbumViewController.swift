@@ -173,7 +173,7 @@ class PhotoAlbumViewController: UIViewController {
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "\(pin)-photos")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         
         do {
@@ -187,9 +187,14 @@ class PhotoAlbumViewController: UIViewController {
     
     private func deletePhoto(indexPath: IndexPath) {
         setupFetchedResultsController()
+
+        DataModel.photosData.remove(at: indexPath.item)
+        if shouldDownload {
+            photosInfo.remove(at: indexPath.item)
+        }
         
         let photoToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(photoToDelete)
+        pin.removeFromPhotos(photoToDelete)
         try? dataController.viewContext.save()
     }
     
@@ -275,10 +280,6 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         return BlockOperation(block: { [weak self] in
             if let this = self {
                 this.collectionView!.deleteItems(at: [indexPath!])
-                DataModel.photosData.remove(at: indexPath!.item)
-                if this.shouldDownload {
-                    this.photosInfo.remove(at: indexPath!.item)
-                }
             }
         })
     }

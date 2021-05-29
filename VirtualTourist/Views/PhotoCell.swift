@@ -26,15 +26,15 @@ class PhotoCell: UICollectionViewCell {
     
     
     private func savePhoto(pin: Pin, photoData: Data) {
-        guard let backgroundContext = dataController.backgroundContext else { return }
-        let pinFromBackgroundContext = backgroundContext.object(with: pin.objectID) as! Pin
+        let viewContext = dataController.viewContext// else { return }
+        let pinToUpdate = viewContext.object(with: pin.objectID) as! Pin
         
-        backgroundContext.perform {
-            let photo = Photo(context: backgroundContext)
-            photo.pin = pinFromBackgroundContext
+        viewContext.perform {
+            let photo = Photo(context: viewContext)
+            photo.pin = pinToUpdate
             photo.data = photoData
             photo.creationDate = Date()
-            try? backgroundContext.save()
+            try? viewContext.save()
         }
     }
 
