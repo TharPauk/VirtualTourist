@@ -28,7 +28,6 @@ class PhotoAlbumViewController: UIViewController {
     var selectedLocation: CLLocation!
     var dataController: DataController!
     
-    private var isReset = false
     private var shouldDownload = true
     private var photosInfo = [PhotoInfo]()
     private var blockOperations = [BlockOperation]()
@@ -91,7 +90,6 @@ class PhotoAlbumViewController: UIViewController {
         fetchedResultsController = nil
         DataModel.photosData = []
         photosInfo = []
-        isReset = true
         
         self.dataController.viewContext.performAndWait{
             let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
@@ -265,7 +263,6 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
 
 
 
-
 // MARK: - MKMapViewDelegate
 
 extension PhotoAlbumViewController: MKMapViewDelegate {
@@ -285,9 +282,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     private func deleteOperation(_ indexPath: IndexPath?) -> BlockOperation {
         return BlockOperation(block: { [weak self] in
             if let this = self {
-                if !this.isReset {
-                    this.collectionView!.deleteItems(at: [indexPath!])
-                }
+                this.collectionView!.deleteItems(at: [indexPath!])
             }
         })
     }
