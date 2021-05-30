@@ -113,29 +113,37 @@
                                     <action selector="newCollectionButtonPressed:" destination="1F6-zK-D4T" eventType="touchUpInside" id="syl-5B-mB9"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="AXx-EN-mVq">
+                                <rect key="frame" x="0.0" y="244" width="414" height="565"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="TeD-Y5-Mou"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="5Xn-dK-uTB"/>
                             <constraint firstItem="FpT-hl-w5V" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="5cx-35-hrX"/>
+                            <constraint firstItem="AXx-EN-mVq" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="DGA-Gc-U5Y"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="G0j-Wz-cBo"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="top" secondItem="FpT-hl-w5V" secondAttribute="bottom" constant="8" symbolic="YES" id="G8f-ul-liu"/>
                             <constraint firstItem="FpT-hl-w5V" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="GuT-Pp-eq4"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="Jkv-pw-d9h"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="UfM-0A-da3"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="top" secondItem="Z5o-dn-KN4" secondAttribute="bottom" constant="8" symbolic="YES" id="Uvi-wo-xcY"/>
+                            <constraint firstItem="b30-k7-lnF" firstAttribute="top" secondItem="AXx-EN-mVq" secondAttribute="bottom" constant="8" symbolic="YES" id="ZET-gN-Roq"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="centerX" secondItem="Ijj-yd-O86" secondAttribute="centerX" id="c6j-aN-Zlh"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="top" secondItem="TeD-Y5-Mou" secondAttribute="top" id="f04-y5-OPL"/>
+                            <constraint firstItem="AXx-EN-mVq" firstAttribute="trailing" secondItem="TeD-Y5-Mou" secondAttribute="trailing" id="i4H-RN-PYv"/>
                             <constraint firstItem="TeD-Y5-Mou" firstAttribute="trailing" secondItem="b30-k7-lnF" secondAttribute="trailing" constant="16" id="kew-e3-Y1V"/>
                             <constraint firstItem="Z5o-dn-KN4" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="lRP-M0-IaC"/>
                             <constraint firstItem="FpT-hl-w5V" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="lhR-ii-byK"/>
+                            <constraint firstItem="AXx-EN-mVq" firstAttribute="top" secondItem="Ku4-Nb-NAh" secondAttribute="bottom" id="uAQ-Gf-nFi"/>
                             <constraint firstItem="b30-k7-lnF" firstAttribute="bottom" secondItem="TeD-Y5-Mou" secondAttribute="bottom" id="wAk-4w-NB3"/>
                             <constraint firstItem="Ku4-Nb-NAh" firstAttribute="leading" secondItem="TeD-Y5-Mou" secondAttribute="leading" id="wnw-tT-oXk"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Photo Album" id="aMf-pw-lYy"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="AXx-EN-mVq" id="40Q-Ra-tgH"/>
                         <outlet property="collectionView" destination="Z5o-dn-KN4" id="xxJ-nv-Arw"/>
                         <outlet property="flowLayout" destination="Aqg-Mr-pGm" id="HbC-6c-Ddx"/>
                         <outlet property="mapView" destination="Ku4-Nb-NAh" id="QfW-tL-tPR"/>

@@ -20,6 +20,7 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var newCollectionButton: RoundedButton!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     
     // MARK: - Properties
@@ -68,6 +69,7 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     private func setupData() {
+        activityIndicator.startAnimating()
         shouldDownload = pin.photos?.count ?? 0 <= 0
         DataModel.photosData = []
        
@@ -77,6 +79,7 @@ class PhotoAlbumViewController: UIViewController {
             setupFetchedResultsController()
             let photos = fetchedResultsController.fetchedObjects ?? []
             DataModel.photosData = photos.map { $0.data! }
+            activityIndicator.stopAnimating()
         }
     }
     
@@ -87,9 +90,12 @@ class PhotoAlbumViewController: UIViewController {
     
 
     @IBAction func newCollectionButtonPressed(_ sender: Any) {
+        
         fetchedResultsController = nil
         DataModel.photosData = []
         photosInfo = []
+        
+        collectionView.reloadData()
         
         self.dataController.viewContext.performAndWait{
             let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
@@ -143,10 +149,10 @@ class PhotoAlbumViewController: UIViewController {
         if let error = error {
             self.alertError(title: "Error in fetching photos", message: "\(error.localizedDescription)")
         }
-        
+        activityIndicator.stopAnimating()
         self.photosInfo = photosInfo
-        self.collectionView.reloadData()
-        self.setDownloadingState(isDownloading: false)
+        collectionView.reloadData()
+        setDownloadingState(isDownloading: false)
     }
     
     
