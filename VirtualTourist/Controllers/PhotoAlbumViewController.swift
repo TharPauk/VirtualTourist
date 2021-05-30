@@ -28,6 +28,7 @@ class PhotoAlbumViewController: UIViewController {
     var selectedLocation: CLLocation!
     var dataController: DataController!
     
+    private var isReset = false
     private var shouldDownload = true
     private var photosInfo = [PhotoInfo]()
     private var blockOperations = [BlockOperation]()
@@ -70,10 +71,13 @@ class PhotoAlbumViewController: UIViewController {
     private func setupData() {
         shouldDownload = pin.photos?.count ?? 0 <= 0
         DataModel.photosData = []
+        print("DATAMODEL = \(DataModel.photosData.count)")
         
         if shouldDownload {
+            print("downloading new contents")
             fetchPhotos(coordinate: selectedLocation.coordinate)
         } else {
+            print("not downloading new contents")
             setupFetchedResultsController()
             let photos = fetchedResultsController.fetchedObjects ?? []
             DataModel.photosData = photos.map { $0.data! }
@@ -85,16 +89,20 @@ class PhotoAlbumViewController: UIViewController {
     
     // MARK: - Button Related Functions
     
+
     @IBAction func newCollectionButtonPressed(_ sender: Any) {
-        self.collectionView.reloadData()
+        fetchedResultsController = nil
         DataModel.photosData = []
         photosInfo = []
+        isReset = true
         
-        let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
-        pinToDeletePhotos.photos = nil
-        try? dataController.viewContext.save()
+        self.dataController.viewContext.performAndWait{
+            let pinToDeletePhotos = dataController.viewContext.object(with: self.pin.objectID) as! Pin
+            pinToDeletePhotos.photos = []
+            try? dataController.viewContext.save()
+        }
         
-        self.fetchPhotos(coordinate: selectedLocation.coordinate)
+        setupData()
     }
     
     private func setDownloadingState(isDownloading: Bool) {
@@ -129,6 +137,7 @@ class PhotoAlbumViewController: UIViewController {
     // MARK: - Networking Related Functions
 
     private func fetchPhotos(coordinate: CLLocationCoordinate2D) {
+        
         setDownloadingState(isDownloading: true)
         FlickrClient.getPhotosList(latitude: coordinate.latitude, longitude: coordinate.longitude, completion: handleGetPhotosList(photosInfo:error:))
     }
@@ -169,6 +178,7 @@ class PhotoAlbumViewController: UIViewController {
     // MARK: - CoreData Related Functions
     
     private func setupFetchedResultsController() {
+        print("FETCH RESULTS")
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
@@ -237,20 +247,25 @@ extension PhotoAlbumViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCell
         cell.dataController = self.dataController
         
+        print("index = \(indexPath.item)")
         if DataModel.photosData.count > indexPath.item {
             let imageData = DataModel.photosData[indexPath.item]
+            print("IF = \(DataModel.photosData.count)")
             cell.imageView.image = UIImage(data: imageData)
         } else {
+            print("ELSE = \(DataModel.photosData.count)")
             cell.downloadPhoto(for: photosInfo[indexPath.item], pin: pin)
         }
-        
+        print("-------------------------------------------")
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if shouldDownload {
+            print("photosInfo.count = \(photosInfo.count)")
             return photosInfo.count
         }
+        print("DataModel.photosData.count = \(DataModel.photosData.count)")
         return DataModel.photosData.count
     }
     
@@ -279,7 +294,9 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     private func deleteOperation(_ indexPath: IndexPath?) -> BlockOperation {
         return BlockOperation(block: { [weak self] in
             if let this = self {
-                this.collectionView!.deleteItems(at: [indexPath!])
+                if !this.isReset {
+                    this.collectionView!.deleteItems(at: [indexPath!])
+                }
             }
         })
     }

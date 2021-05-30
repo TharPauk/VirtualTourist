@@ -17,7 +17,7 @@ class FlickrClient {
         
         static let methodParam = "/?method=flickr.photos.search"
         static let apiKeyParam = "&api_key=\(FlickrClient.apiKey)"
-        static let formatParam = "&per_page=30&format=json&nojsoncallback=1"
+        static let formatParam = "&per_page=15&format=json&nojsoncallback=1"
         
         case search(latitude: Double, longitude: Double, page: Int)
         case downloadImage(server: String, id: String, secret: String)
